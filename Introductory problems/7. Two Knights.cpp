@@ -55,21 +55,31 @@ struct custom_hash {
         return splitmix64(x + FIXED_RANDOM);
     }
 };
- 
+
 //Network Simulator 
- 
+
  
 void solve() {
-    cinll(n);
-    ll curr = 5;
-    ll ans = 0;
-    while(curr <= n) {
-        ans += n / curr;
-        curr *= 5;
+    cinll(x);
+    for(ll n = 1;n <= x; n++) {
+        ll ans = n*n * (n*n - 1) / 2;
+        ll invalid_pos = 0;
+        ll cnt = 0;
+        // if(n >= 4) {
+            invalid_pos += 4 * 2;
+            invalid_pos += 8 * 3;
+            invalid_pos += (n-4) * 4 * 4;
+            invalid_pos += 4 * 4;
+            invalid_pos += (n-4) * 4 * 6;
+            invalid_pos += (n-4) * (n-4) * 8;
+        // }
+        // cout<<cnt<<" ";
+        cout<<ans - invalid_pos/2 <<"\n";
     }
-    cout<<ans;
     return;
 }    
+ 
+ 
 int main(){
     // fio;
     // cinll(t);
