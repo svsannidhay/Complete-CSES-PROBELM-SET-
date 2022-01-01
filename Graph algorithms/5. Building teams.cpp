@@ -43,53 +43,57 @@ const ll maxN = 17;
 using namespace std;
 using u64 = uint64_t;
  
-ll arr[1001][1001];
-ll visited[1001][1001];
- 
-void dfs(ll currx,ll curry,ll n,ll m) {
-    visited[currx][curry] = 1;
-    if(currx + 1 <= n && arr[currx + 1][curry] == 1) {
-        if(visited[currx+1][curry] == 0)    
-            dfs(currx + 1,curry,n,m);
-    }
-    if(currx - 1 >= 1 && arr[currx - 1][curry] == 1) {
-        if(visited[currx-1][curry] == 0)    
-            dfs(currx - 1,curry,n,m);
-    }
-    if(curry + 1 <= m && arr[currx][curry + 1] == 1) {
-        if(visited[currx][curry + 1] == 0)    
-            dfs(currx,curry + 1,n,m);
-    }
-    if(curry - 1 >= 1 && arr[currx][curry - 1] == 1) {
-        if(visited[currx][curry-1] == 0)    
-            dfs(currx,curry - 1,n,m);
-    }
+void addEdge(vector<ll> adj[],ll a,ll b) {
+    adj[a].pb(b);
+    adj[b].pb(a);
+    return;
 }
  
+bool dfs(vector< ll > adj[], vector<bool> &visited, vector<ll> &color,ll current,ll col) {    
+        visited[current] = true;
+        color[current] = col;
+        bool result = true;
+        for(auto i : adj[current]) {
+            if(!visited[i]) {
+                if(dfs(adj,visited,color,i,col ^ 1) == false) return false;
+            }
+            else {
+                if(color[current] == color[i]) return false;
+            }
+        }
+        return result;
+}
+ 
+bool bipartite(vector<ll> adj[],vector<ll> &color,ll n) {
+    bool isbp = true;
+    vector<bool> visited(n+1,false);
+    for(ll i = 1; i <= n; i++) {
+        if(!visited[i]) { 
+            bool res = dfs(adj,visited,color,i,1);
+            isbp = (isbp & res);
+        }
+    }
+    return isbp;
+}
  
 void solve() {
     cinll(n);cinll(m);
-    memset(arr,0,sizeof(arr));
-    for(ll i=0;i<n;i++) {
-        cins(s);
-        for(ll j=0;j<s.length();j++) {
-            if(s[j] == '.') {
-                arr[i+1][j+1] = 1;
-            }
-        }
+    vector< ll > adj[n+1];
+    for(ll i=0;i<m;i++) {
+        cinll(a);cinll(b);
+        addEdge(adj,a,b);
     }
- 
-    ll ans = 0;
-    memset(visited,0,sizeof(visited));
-    for(ll i = 1; i <= n; i++) {
-        for(ll j = 1; j <= m; j++) {
-            if(visited[i][j] == 0 && arr[i][j] == 1) {
-                ans++;
-                dfs(i,j,n,m);
-            }
+    vector< ll > color(n+1,0);
+    if(bipartite(adj,color,n)) {
+        for(ll i=0;i<n+1;i++) {
+            if(color[i] == 0) color[i] = 2;
         }
+        for(ll i = 1;i <= n;i++) {
+            cout<<color[i]<<" "; 
+        }
+    } else {
+        cout<<"IMPOSSIBLE";
     }
-    cout<<ans;
 }
  
 int main() {
